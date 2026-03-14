@@ -22,6 +22,11 @@ docker run  -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
 
 ---------------
 
-docker exec -it containerid /bin/bash
-psql -U postgres
-\dt
+- docker exec -it containerid /bin/bash
+- psql -U postgres
+- \dt
+
+---------------
+
+go to packages/db
+npx prisma studio

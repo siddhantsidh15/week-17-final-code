@@ -1,8 +1,9 @@
 import express from "express";
 import db from "@repo/db/client";
+import prisma from "@repo/db/client";
 const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 app.post("/hdfcWebhook", async (req, res) => {
     //TODO: Add zod validation here?
@@ -16,6 +17,19 @@ app.post("/hdfcWebhook", async (req, res) => {
         userId: req.body.user_identifier,
         amount: req.body.amount
     };
+
+    // check if the transaction is processing
+    const onRampTxn = await prisma.onRampTransaction.findMany({
+        where: {
+        token: paymentInformation.token,
+        },
+    });
+
+    if(!onRampTxn || onRampTxn.length === 0 || onRampTxn[0]?.status !== "Processing") {
+        return res.status(400).json({
+            message: "No processing transaction found for this token"
+        })
+    }
 
     try {
         await db.$transaction([
